@@ -38,7 +38,7 @@ namespace ThetaEC.Controllers
             {
                 return NotFound();
             }
-
+            ViewBag.test = "Test";
             return View(address);
         }
 
@@ -122,7 +122,7 @@ namespace ThetaEC.Controllers
             {
                 return NotFound();
             }
-
+            ViewBag.test = "Test";
             var address = await _context.Addresses
                 .FirstOrDefaultAsync(m => m.Id == id);
             if (address == null)
