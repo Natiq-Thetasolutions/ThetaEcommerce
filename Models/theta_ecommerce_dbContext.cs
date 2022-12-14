@@ -9,6 +9,7 @@ namespace ThetaEC.Models
     {
         public theta_ecommerce_dbContext()
         {
+            //this is 0 parameter constru
         }
 
         public theta_ecommerce_dbContext(DbContextOptions<theta_ecommerce_dbContext> options)
