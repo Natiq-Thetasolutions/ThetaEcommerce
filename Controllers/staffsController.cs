@@ -12,10 +12,11 @@ namespace ThetaEC.Controllers
     public class staffsController : Controller
     {
         private readonly theta_ecommerce_dbContext _context;
-
-        public staffsController(theta_ecommerce_dbContext context)
+        private readonly IWebHostEnvironment _he;
+        public staffsController(theta_ecommerce_dbContext context, IWebHostEnvironment he)
         {
             _context = context;
+            _he = he;
         }
 
         // GET: staffs
@@ -53,10 +54,32 @@ namespace ThetaEC.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Image,Name,Email,PhoneNumber,City,Address,Dob,SystemUserId,Role,Status,CreatedBy,CreatedDate,ModifiedBy,ModifiedDate,MetaData")] staff staff)
+        public async Task<IActionResult> Create([Bind("Id,Image,Name,Email,PhoneNumber,City,Address,Dob,SystemUserId,Role,Status,CreatedBy,CreatedDate,ModifiedBy,ModifiedDate,MetaData")] staff staff,
+            IFormFile PP)
         {
+            string OriginalFileName = PP.FileName;
+
+            string FileExt = Path.GetExtension(OriginalFileName);
+
+            string NewFileName = Guid.NewGuid().ToString();
+
+
+            string FinalFileName = NewFileName + FileExt;
+
+
+            string BasePath = "/data/staff/pps/";
+            
+            using (FileStream FS = new FileStream(_he.WebRootPath+BasePath+FinalFileName,FileMode.Create))
+            {
+                PP.CopyTo(FS);
+            }
+            
+
+
             if (ModelState.IsValid)
             {
+
+                staff.Image = BasePath+FinalFileName;
                 _context.Add(staff);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
@@ -145,6 +168,16 @@ namespace ThetaEC.Controllers
             var staff = await _context.staff.FindAsync(id);
             if (staff != null)
             {
+                if(staff.Image != "")
+                {
+                   // System.IO.File.Exists(staff.Image);
+                    System.IO.File.Delete(staff.Image);
+                }
+
+
+
+
+
                 _context.staff.Remove(staff);
             }
             
