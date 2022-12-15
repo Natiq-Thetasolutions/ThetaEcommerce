@@ -57,29 +57,18 @@ namespace ThetaEC.Controllers
         public async Task<IActionResult> Create([Bind("Id,Image,Name,Email,PhoneNumber,City,Address,Dob,SystemUserId,Role,Status,CreatedBy,CreatedDate,ModifiedBy,ModifiedDate,MetaData")] staff staff,
             IFormFile PP)
         {
-            string OriginalFileName = PP.FileName;
-
-            string FileExt = Path.GetExtension(OriginalFileName);
-
-            string NewFileName = Guid.NewGuid().ToString();
-
-
-            string FinalFileName = NewFileName + FileExt;
-
-
-            string BasePath = "/data/staff/pps/";
+            string FinalFilePathVirtual= "/data/staff/pps/" + Guid.NewGuid().ToString() + Path.GetExtension(PP.FileName);
             
-            using (FileStream FS = new FileStream(_he.WebRootPath+BasePath+FinalFileName,FileMode.Create))
+            using (FileStream FS = new FileStream(_he.WebRootPath+ FinalFilePathVirtual, FileMode.Create))
             {
                 PP.CopyTo(FS);
-            }
-            
+            }          
 
 
             if (ModelState.IsValid)
             {
 
-                staff.Image = BasePath+FinalFileName;
+                staff.Image = FinalFilePathVirtual;
                 _context.Add(staff);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
